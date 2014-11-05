@@ -1,0 +1,42 @@
+package org.fenixedu.reports.domain;
+
+public class ReportTemplate {
+    String reportKey;
+    LocalizedString name;
+    LocalizedString description;
+}
+
+public class ReportTemplatesSystem {
+    boolean useService;
+    String serviceHost;
+    int servicePort;
+    String outputFormat;
+}
+
+relation ReportTemplateFile {
+    ReportTemplate playsRole report {
+      multiplicity 0..1;
+    }
+
+    .org.fenixedu.bennu.io.domain.GenericFile playsRole templateFile {
+      multiplicity 1..1;
+    }
+}
+
+relation reportTemplatesSystemBennu {
+    .org.fenixedu.bennu.core.domain.Bennu playsRole bennu{
+        multiplicity 1..1;
+    }
+    ReportTemplatesSystem playsRole reportTemplatesSystem {
+        multiplicity 0..1;
+    }
+}
+
+relation ReportTemplateReportTemplatesSystem {
+    ReportTemplatesSystem playsRole system {
+       multiplicity 1..1;
+    }
+    ReportTemplate playsRole reportTemplates {
+       multiplicity *;
+    }
+  }

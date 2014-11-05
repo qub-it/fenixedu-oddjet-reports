@@ -1,92 +1,59 @@
 package net.sourceforge.fenixedu.util.report;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
-import org.fenixedu.oddjet.PrintUtils;
 import org.fenixedu.oddjet.Template;
 import org.fenixedu.oddjet.table.CategoricalTableData;
 import org.fenixedu.oddjet.table.EntryListTableData;
 import org.fenixedu.oddjet.table.PositionalTableData;
+import org.fenixedu.oddjet.utils.PrintUtils;
+import org.fenixedu.reports.domain.ReportTemplate;
+import org.fenixedu.reports.domain.ReportTemplatesSystem;
 import org.odftoolkit.simple.TextDocument;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.google.common.base.Preconditions;
 
-public class OdtReportPrinter implements ReportPrinter {
+public class TemplateReportPrinter implements ReportPrinter {
 
-    private static final String DEFAULT_KEY = "default";
-    private final Map<String, Template> reportsMap = new ConcurrentHashMap<String, Template>();
-    private final Properties properties = new Properties();
-    private final Template defaultReport;
+    private Template defaultReport;
 
-    public OdtReportPrinter() {
-        try {
-            loadReportsProperties(properties);
-        } catch (IOException e) {
-            throw new RuntimeException("Unable to load properties files.", e);
+    public TemplateReportPrinter() {
+        InputStream fileStream = ReportsUtils.class.getClassLoader().getResourceAsStream("reports/default.odt");
+        if (fileStream == null) {
+            throw new RuntimeException("Default odt report is missing.");
         }
-        defaultReport =
-                new Template(ReportsUtils.class.getClassLoader().getResourceAsStream(properties.getProperty(DEFAULT_KEY)));
-    }
-
-    public static void loadReportsProperties(final Properties properties) throws IOException {
-        final Enumeration<URL> resources = ReportsUtils.class.getClassLoader().getResources("reports.properties");
-        while (resources.hasMoreElements()) {
-            URL reportsURL = resources.nextElement();
-            final InputStream inputStream = reportsURL.openStream();
-            if (inputStream != null) {
-                properties.load(inputStream);
-            }
-        }
+        defaultReport = new Template(fileStream);
     }
 
     @Override
     public byte[] printReports(ReportDescription... reports) throws Exception {
-        String reportKey, reportPath;
-        InputStream reportFile;
-        Template report;
+        ReportTemplate report;
+        Template template;
         TextDocument next, master = null;
 
         int n = 1;
         for (ReportDescription desc : reports) {
-            reportKey = desc.getKey();
-            report = reportsMap.get(reportKey);
+            report = ReportTemplatesSystem.getInstance().getReportTemplate(desc.getKey());
 
             if (report == null) {
-                if ((reportPath = properties.getProperty(reportKey)) != null
-                        && (reportFile = ReportsUtils.class.getClassLoader().getResourceAsStream(reportPath)) != null) {
-                    report = new Template(reportFile);
-                    reportsMap.put(reportKey, report);
-                    fillData(report, desc.getParameters());
-                } else {
-                    report = defaultReport;
-                    clearData(defaultReport);
-                    if (reportPath == null) {
-                        fillDefaultData(reportKey, "", "the provided key does not match any known report", desc.getParameters());
-                    } else {
-                        fillDefaultData(reportKey, reportPath, "the report file could not be found", desc.getParameters());
-                    }
-                }
+                template = defaultReport;
+                prepareDefaultReport(desc.getKey(), "the provided key does not match any known report", desc.getParameters());
             } else {
-                clearData(report);
-                fillData(report, desc.getParameters());
+                template = report.getTemplate();
+                prepareReport(template, desc.getParameters());
             }
 
-            next = report.getInstance();
+            next = template.getInstance();
 
             if (master == null) {
                 master = next;
@@ -119,7 +86,7 @@ public class OdtReportPrinter implements ReportPrinter {
 
         byte[] result = null;
         if (master != null) {
-            result = PrintUtils.getPDFByteArray(master);
+            result = PrintUtils.print(master, ReportTemplatesSystem.getInstance().getPrintingService());
             if (result == null) {
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 master.save(out);
@@ -172,9 +139,10 @@ public class OdtReportPrinter implements ReportPrinter {
         }
     }
 
-    private void fillData(Template report, Map<String, Object> parameters) {
+    private void prepareReport(Template report, Map<String, Object> parameters) {
         Preconditions.checkNotNull(parameters);
         Preconditions.checkNotNull(report);
+        clearData(report);
         //Map<String,List> objects get converted to CategoricalTableData, Iterable<Iterable> and object[][] to PositionalTableData
         //and other Iterable objects to EntryListTableData. All others are taken as simple parameters.
         for (Entry<String, Object> parameter : parameters.entrySet()) {
@@ -200,12 +168,13 @@ public class OdtReportPrinter implements ReportPrinter {
         }
     }
 
-    private void fillDefaultData(String key, String path, String error, Map<String, Object> parameters) {
+    private void prepareDefaultReport(String key, String error, Map<String, Object> parameters) {
         Preconditions.checkNotNull(parameters);
+
+        clearData(defaultReport);
 
         defaultReport.addParameter("error", error);
         defaultReport.addParameter("reportKey", key);
-        defaultReport.addParameter("reportPath", path);
 
         Map<String, List> data = new HashMap<String, List>();
         List<String> keys = new ArrayList<String>();
