@@ -108,7 +108,6 @@ public class AdminReportTemplates {
             model.addAttribute("reportDescription", report.getDescription().json());
             model.addAttribute("reportName", report.getName().json());
             model.addAttribute("reportKey", key);
-            model.addAttribute("templateUrl", report.getDownloadUrl());
             return "odt-reports/edit";
         } else {
             throw ReportsDomainException.keyNotFound();
@@ -157,7 +156,6 @@ public class AdminReportTemplates {
         model.addAttribute("reportDescription", description.json());
         model.addAttribute("reportName", name.json());
         model.addAttribute("reportKey", key);
-        model.addAttribute("templateUrl", report.getDownloadUrl());
         return "odt-reports/edit";
     }
 

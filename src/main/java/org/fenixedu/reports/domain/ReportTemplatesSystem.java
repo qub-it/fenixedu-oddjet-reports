@@ -12,7 +12,7 @@ public class ReportTemplatesSystem extends ReportTemplatesSystem_Base {
 
     public static String[] formats = {
             //XXX could not extract formats programmatically from JODConverter
-            "pdf", "rtf", "txt", "wiki", "html", "odt", "sxw", "doc" };
+            "PDF", "RTF", "TXT", "WIKI", "HTML", "ODT", "SXW", "DOC" };
 
     private ReportTemplatesSystem() {
         super();

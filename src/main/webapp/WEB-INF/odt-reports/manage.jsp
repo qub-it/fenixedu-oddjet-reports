@@ -27,8 +27,8 @@
 				<c:forEach var="report" items="${reports}">
 					<tr>
 						<td class="col-md-6"><strong>${report.name.content}</strong><br/><small>${report.description.content}</small></td>
-						<td class="text-center">${report.reportKey}</td>
-						<td>
+						<td class="col-md-3 text-center"><code>${report.reportKey}</code></td>
+						<td class="col-md-3">
 							<div class="btn-group">
 								<a href="${report.downloadUrl}" class="btn btn-sm btn-default">
 									<spring:message code="action.download"/>
