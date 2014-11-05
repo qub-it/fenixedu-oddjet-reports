@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
 import pt.ist.fenixframework.Atomic;
@@ -60,8 +59,8 @@ public class AdminReportTemplates {
     }
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public RedirectView add(Model model, @RequestParam String key, @RequestParam LocalizedString name,
-            @RequestParam LocalizedString description, @RequestParam MultipartFile file, RedirectAttributes redirectAttributes) {
+    public String add(Model model, @RequestParam String key, @RequestParam LocalizedString name,
+            @RequestParam LocalizedString description, @RequestParam MultipartFile file) {
 
         byte[] fileContent = null;
         DataErrorBean errors = new DataErrorBean();
@@ -92,26 +91,23 @@ public class AdminReportTemplates {
 
         if (errors.isEmpty()) {
             editReportTemplate(null, key, name, description, fileContent);
-            redirectAttributes.addFlashAttribute("successful", true);
+            model.addAttribute("successful", true);
         } else {
-            redirectAttributes.addFlashAttribute("errors", errors);
+            model.addAttribute("errors", errors);
         }
-        redirectAttributes.addFlashAttribute("reportDescription", description.json());
-        redirectAttributes.addFlashAttribute("reportName", name.json());
-        redirectAttributes.addFlashAttribute("reportKey", key);
-        return new RedirectView("add", true);
+        model.addAttribute("reportDescription", description.json());
+        model.addAttribute("reportName", name.json());
+        model.addAttribute("reportKey", key);
+        return "odt-reports/edit";
     }
 
     @RequestMapping(value = "/{key}/edit", method = RequestMethod.GET)
     public String edit(@PathVariable("key") String key, Model model) {
-        ReportTemplate report;
-        if (key != null && (report = ReportTemplatesSystem.getInstance().getReportTemplate(key)) != null) {
-            if (!model.containsAttribute("errors") && !model.containsAttribute("successful")) {
-                //not a redirect from a previous edit attempt
-                model.addAttribute("reportDescription", report.getDescription().json());
-                model.addAttribute("reportName", report.getName().json());
-                model.addAttribute("reportKey", key);
-            }
+        ReportTemplate report = ReportTemplatesSystem.getInstance().getReportTemplate(key);
+        if (report != null) {
+            model.addAttribute("reportDescription", report.getDescription().json());
+            model.addAttribute("reportName", report.getName().json());
+            model.addAttribute("reportKey", key);
             model.addAttribute("templateUrl", report.getDownloadUrl());
             return "odt-reports/edit";
         } else {
@@ -120,9 +116,8 @@ public class AdminReportTemplates {
     }
 
     @RequestMapping(value = "/{key}/edit", method = RequestMethod.POST)
-    public RedirectView edit(@PathVariable("key") String oldKey, Model model, @RequestParam String key,
-            @RequestParam LocalizedString name, @RequestParam LocalizedString description, @RequestParam MultipartFile file,
-            RedirectAttributes redirectAttributes) {
+    public String edit(@PathVariable("key") String oldKey, Model model, @RequestParam String key,
+            @RequestParam LocalizedString name, @RequestParam LocalizedString description, @RequestParam MultipartFile file) {
         ReportTemplate report;
         if (oldKey == null || oldKey.isEmpty()
                 || (report = ReportTemplatesSystem.getInstance().getReportTemplate(oldKey)) == null) {
@@ -155,15 +150,15 @@ public class AdminReportTemplates {
 
         if (errors.isEmpty()) {
             editReportTemplate(report, key, name, description, fileContent);
-            redirectAttributes.addFlashAttribute("successful", true);
+            model.addAttribute("successful", true);
         } else {
-            redirectAttributes.addFlashAttribute("errors", errors);
+            model.addAttribute("errors", errors);
         }
-        redirectAttributes.addFlashAttribute("reportDescription", description.json());
-        redirectAttributes.addFlashAttribute("reportName", name.json());
-        redirectAttributes.addFlashAttribute("reportKey", key);
-        //TODO why not skip the redirect and use just the model? it would certainly save time.
-        return new RedirectView("edit", true);
+        model.addAttribute("reportDescription", description.json());
+        model.addAttribute("reportName", name.json());
+        model.addAttribute("reportKey", key);
+        model.addAttribute("templateUrl", report.getDownloadUrl());
+        return "odt-reports/edit";
     }
 
     @RequestMapping(value = "/{key}/delete")
