@@ -1,4 +1,4 @@
-package net.sourceforge.fenixedu.util.report;
+package org.fenixedu.academic.util.report;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;

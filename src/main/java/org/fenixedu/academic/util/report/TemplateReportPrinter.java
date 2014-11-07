@@ -1,4 +1,4 @@
-package net.sourceforge.fenixedu.util.report;
+package org.fenixedu.academic.util.report;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
