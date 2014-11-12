@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 
 import org.apache.tika.Tika;
 import org.fenixedu.bennu.core.groups.DynamicGroup;
-import org.fenixedu.bennu.io.domain.GenericFile;
 import org.fenixedu.bennu.io.domain.GroupBasedFile;
 import org.fenixedu.bennu.spring.portal.SpringApplication;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
@@ -212,9 +211,7 @@ public class AdminReportTemplates {
             report.setName(name);
             report.setDescription(description);
             if (fileContent != null) {
-                GenericFile cur = report.getTemplateFile();
-                report.setTemplateFile(new GroupBasedFile(name.getContent(), key, fileContent, DynamicGroup.get("managers")));
-                cur.delete();
+                report.addTemplateFile(new GroupBasedFile(name.getContent(), key, fileContent, DynamicGroup.get("managers")));
             }
         } else {
             new ReportTemplate(key, name, description, new GroupBasedFile(name.getContent(), key, fileContent,

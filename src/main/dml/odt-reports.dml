@@ -18,7 +18,7 @@ relation ReportTemplateFile {
     }
 
     .org.fenixedu.bennu.io.domain.GenericFile playsRole templateFile {
-      multiplicity 1..1;
+      multiplicity 1..*;
     }
 }
 
