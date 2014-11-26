@@ -40,21 +40,8 @@
       		<c:if test="${errors.onPort != null}"><p class="text-danger"><spring:message code="${errors.onPort}"/></p></c:if>
        	</div>
   	</div>
-  	  	
-  	<div class="form-group ${errors.onOutputFormat != null ? 'has-error' : ''}">
-    	<label for="OutputFormat" class="col-sm-2 control-label"><spring:message code="pages.configure.label.format"/>:</label>
-    	<div class="col-sm-1">
-    		<select name="formatSel" id="OutputFormat" class="text-center form-control service-dependent-d" onchange="form.format.value = this.value">
-				<c:forEach items="${formats}" var="formatOpt">
-					<option class="text-center" value="${formatOpt}" ${format == formatOpt? 'selected' : ''} >${formatOpt}</option>
-				</c:forEach>
-			</select>
-			<input type="hidden" name="format" value="${format}">
-      		<c:if test="${errors.onOutputFormat != null}"><p class="text-danger"><spring:message code="${errors.onOutputFormat}"/></p></c:if>
-    	</div>
-  	</div>
   	
-    <div class="form-group">
+  	<div class="form-group">
         <div class="col-sm-offset-2 col-sm-6">
             <button type="submit" class="btn btn-default btn-primary">
 				<spring:message code="action.configure"/>

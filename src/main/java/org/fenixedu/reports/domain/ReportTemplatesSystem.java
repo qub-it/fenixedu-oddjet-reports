@@ -1,7 +1,5 @@
 package org.fenixedu.reports.domain;
 
-import java.util.Arrays;
-
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.oddjet.utils.OpenOfficePrintingService;
 
@@ -10,16 +8,13 @@ import pt.ist.fenixframework.Atomic.TxMode;
 
 public class ReportTemplatesSystem extends ReportTemplatesSystem_Base {
 
-    public static String[] formats = {
-            //XXX could not extract formats programmatically from JODConverter
-            "PDF", "RTF", "TXT", "WIKI", "HTML", "ODT", "SXW", "DOC" };
+    private static final String PDF_FORMAT = "pdf";
 
     private ReportTemplatesSystem() {
         super();
         setUseService(false);
         setServiceHost("localhost");
         setServicePort(8100);
-        setOutputFormat("pdf");
         setBennu(Bennu.getInstance());
     }
 
@@ -40,7 +35,7 @@ public class ReportTemplatesSystem extends ReportTemplatesSystem_Base {
 
     public OpenOfficePrintingService getPrintingService() {
         try {
-            return new OpenOfficePrintingService(getServiceHost(), getServicePort(), getOutputFormat());
+            return new OpenOfficePrintingService(getServiceHost(), getServicePort(), PDF_FORMAT);
         } catch (Exception e) {
             return null;
         }
@@ -48,12 +43,7 @@ public class ReportTemplatesSystem extends ReportTemplatesSystem_Base {
 
     @Override
     public boolean getUseService() {
-        return super.getUseService() && IsValidFormat(getOutputFormat())
-                && OpenOfficePrintingService.isValidService(getServiceHost(), getServicePort());
-    }
-
-    public static boolean IsValidFormat(String format) {
-        return Arrays.stream(ReportTemplatesSystem.formats).anyMatch(f -> f.equals(format));
+        return super.getUseService() && OpenOfficePrintingService.isValidService(getServiceHost(), getServicePort());
     }
 
     public ReportTemplate getReportTemplate(String key) {

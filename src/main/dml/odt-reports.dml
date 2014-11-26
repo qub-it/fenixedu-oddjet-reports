@@ -10,7 +10,6 @@ public class ReportTemplatesSystem {
     boolean useService;
     String serviceHost;
     int servicePort;
-    String outputFormat;
 }
 
 relation ReportTemplateFile {

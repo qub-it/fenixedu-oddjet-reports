@@ -23,14 +23,12 @@ public class ConfigureReportTemplatesSystem {
         model.addAttribute("use", system.getUseService());
         model.addAttribute("host", system.getServiceHost());
         model.addAttribute("port", system.getServicePort());
-        model.addAttribute("format", system.getOutputFormat());
-        model.addAttribute("formats", ReportTemplatesSystem.formats);
         return "odt-reports/configure";
     }
 
     @RequestMapping(method = RequestMethod.POST)
     public String configure(Model model, @RequestParam(required = false, defaultValue = "false") Boolean use,
-            @RequestParam String host, @RequestParam Integer port, @RequestParam String format) {
+            @RequestParam String host, @RequestParam Integer port) {
 
         DataErrorBean errors = new DataErrorBean();
 
@@ -40,17 +38,12 @@ public class ConfigureReportTemplatesSystem {
         if (port < 1 || port > 65535) {
             errors.onPort = "pages.configure.error.port.invalid";
         }
-        if (format == null || format.isEmpty()) {
-            errors.onOutputFormat = "pages.configure.error.format.empty";
-        } else if (!ReportTemplatesSystem.IsValidFormat(format)) {
-            errors.onOutputFormat = "pages.configure.error.format.unknown";
-        }
         if (use && !OpenOfficePrintingService.isValidService(host, port)) {
             errors.onConnection = "pages.configure.error.connection";
         }
 
         if (errors.isEmpty()) {
-            configure(use, host, port, format);
+            configure(use, host, port);
             model.addAttribute("successful", true);
         } else {
             model.addAttribute("errors", errors);
@@ -58,18 +51,15 @@ public class ConfigureReportTemplatesSystem {
         model.addAttribute("use", use);
         model.addAttribute("host", host);
         model.addAttribute("port", port);
-        model.addAttribute("format", format);
-        model.addAttribute("formats", ReportTemplatesSystem.formats);
         return "odt-reports/configure";
     }
 
     @Atomic(mode = TxMode.WRITE)
-    public void configure(Boolean use, String host, int port, String format) {
+    public void configure(Boolean use, String host, int port) {
         ReportTemplatesSystem system = ReportTemplatesSystem.getInstance();
         system.setUseService(use);
         system.setServiceHost(host);
         system.setServicePort(port);
-        system.setOutputFormat(format);
     }
 
     public class DataErrorBean implements Serializable {
