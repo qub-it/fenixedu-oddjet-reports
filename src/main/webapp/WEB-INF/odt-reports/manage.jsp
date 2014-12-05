@@ -10,7 +10,7 @@
 </div>
 
 <c:choose>
-  <c:when test="${reports==null || reports.size() == 0}">
+  <c:when test="${not empty reports}">
   	  <div><spring:message code="pages.manage.emptyReports"/></div>
   </c:when>
 
@@ -27,20 +27,20 @@
 				<c:forEach var="report" items="${reports}">
 					<tr>
 						<td class="col-md-6"><strong>${report.name.content}</strong><br/><small>${report.description.content}</small></td>
-						<td class="col-md-3 text-center"><code>${report.reportKey}</code></td>
+						<td class="col-md-3 text-center"><code>${report.key}</code></td>
 						<td class="col-md-3">
 							<div class="btn-group">
-								<a href="${report.downloadUrl}" class="btn btn-sm btn-default">
+								<a href="${report.link}" class="btn btn-sm btn-default">
 									<spring:message code="action.download"/>
 								</a>
             				</div>
 							<div class="btn-group">
-								<a href="${pageContext.request.contextPath}/reports/templates/${report.reportKey}/edit" class="btn btn-sm btn-default">
+								<a href="${pageContext.request.contextPath}/reports/templates/${report.key}/edit" class="btn btn-sm btn-default">
 									<spring:message code="action.edit"/>
 								</a>
             				</div>
 							<div class="btn-group">
-								<a href="${pageContext.request.contextPath}/reports/templates/${report.reportKey}/delete" class="btn btn-sm btn-danger">
+								<a href="${pageContext.request.contextPath}/reports/templates/${report.key}/delete" class="btn btn-sm btn-danger">
 									<spring:message code="action.delete"/>
 								</a>
             				</div>

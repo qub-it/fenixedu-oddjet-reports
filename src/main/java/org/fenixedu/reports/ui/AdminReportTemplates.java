@@ -1,7 +1,6 @@
 package org.fenixedu.reports.ui;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -15,6 +14,9 @@ import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.reports.domain.ReportTemplate;
 import org.fenixedu.reports.domain.ReportTemplatesSystem;
 import org.fenixedu.reports.exceptions.ReportsDomainException;
+import org.fenixedu.reports.ui.beans.AdminDataErrorBean;
+import org.fenixedu.reports.ui.beans.FileBean;
+import org.fenixedu.reports.ui.beans.ReportBean;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,7 +44,7 @@ public class AdminReportTemplates {
 
     @RequestMapping(value = "/{page}", method = RequestMethod.GET)
     public String list(@PathVariable("page") Integer page, Model model) {
-        List<List<ReportTemplate>> pages = Lists.partition(getReportTemplates(), ITEMS_PER_PAGE);
+        List<List<ReportBean>> pages = Lists.partition(getReportTemplateBeans(), ITEMS_PER_PAGE);
         if (!pages.isEmpty()) {
             int currentPage = Optional.of(page).orElse(0);
             model.addAttribute("numberOfPages", pages.size());
@@ -62,7 +64,7 @@ public class AdminReportTemplates {
             @RequestParam LocalizedString description, @RequestParam MultipartFile file) {
 
         byte[] fileContent = null;
-        DataErrorBean errors = new DataErrorBean();
+        AdminDataErrorBean errors = new AdminDataErrorBean();
         if (key == null || key.isEmpty()) {
             errors.onKey = "pages.edit.error.key.empty";
         } else if (ReportTemplatesSystem.getInstance().getReportTemplate(key) != null) {
@@ -89,7 +91,8 @@ public class AdminReportTemplates {
         }
 
         if (errors.isEmpty()) {
-            editReportTemplate(null, key, name, description, fileContent);
+            ReportTemplate report = editReportTemplate(null, key, name, description, fileContent);
+            model.addAttribute("reportPreviousFiles", getPreviousFileBeans(report));
             model.addAttribute("successful", true);
         } else {
             model.addAttribute("errors", errors);
@@ -104,6 +107,7 @@ public class AdminReportTemplates {
     public String edit(@PathVariable("key") String key, Model model) {
         ReportTemplate report = ReportTemplatesSystem.getInstance().getReportTemplate(key);
         if (report != null) {
+            model.addAttribute("reportPreviousFiles", getPreviousFileBeans(report));
             model.addAttribute("reportDescription", report.getDescription().json());
             model.addAttribute("reportName", report.getName().json());
             model.addAttribute("reportKey", key);
@@ -122,7 +126,7 @@ public class AdminReportTemplates {
             throw ReportsDomainException.keyNotFound();
         }
 
-        DataErrorBean errors = new DataErrorBean();
+        AdminDataErrorBean errors = new AdminDataErrorBean();
         if (key == null || key.isEmpty()) {
             errors.onKey = "pages.edit.error.key.empty";
         }
@@ -152,6 +156,7 @@ public class AdminReportTemplates {
         } else {
             model.addAttribute("errors", errors);
         }
+        model.addAttribute("reportPreviousFiles", getPreviousFileBeans(report));
         model.addAttribute("reportDescription", description.json());
         model.addAttribute("reportName", name.json());
         model.addAttribute("reportKey", key);
@@ -169,43 +174,19 @@ public class AdminReportTemplates {
         return new RedirectView("/reports/templates", true);
     }
 
-    public class DataErrorBean implements Serializable {
+    private List<FileBean> getPreviousFileBeans(ReportTemplate report) {
+        return report.getTemplateFileSet().stream().sorted((f1, f2) -> f2.getCreationDate().compareTo(f1.getCreationDate()))
+                .map(file -> new FileBean(file)).collect(Collectors.toList());
+    }
 
-        //TODO compute the serial UID again...
-        private static final long serialVersionUID = 1798743927098274397L;
-        public String onKey;
-        public String onName;
-        public String onDescription;
-        public String onFile;
-
-        public String getOnKey() {
-            return onKey;
-        }
-
-        public String getOnName() {
-            return onName;
-        }
-
-        public String getOnDescription() {
-            return onDescription;
-        }
-
-        public String getOnFile() {
-            return onFile;
-        }
-
-        public boolean isEmpty() {
-            return onKey == null && onName == null && onDescription == null && onFile == null;
-        }
-    };
-
-    private List<ReportTemplate> getReportTemplates() {
-        return ReportTemplatesSystem.getInstance().getReportTemplatesSet().stream().collect(Collectors.toList());
+    private List<ReportBean> getReportTemplateBeans() {
+        return ReportTemplatesSystem.getInstance().getReportTemplatesSet().stream().map(report -> new ReportBean(report))
+                .collect(Collectors.toList());
     }
 
     @Atomic(mode = TxMode.WRITE)
-    private void editReportTemplate(ReportTemplate report, String key, LocalizedString name, LocalizedString description,
-            byte[] fileContent) {
+    private ReportTemplate editReportTemplate(ReportTemplate report, String key, LocalizedString name,
+            LocalizedString description, byte[] fileContent) {
         if (report != null) {
             report.setReportKey(key);
             report.setName(name);
@@ -214,8 +195,10 @@ public class AdminReportTemplates {
                 report.addTemplateFile(new GroupBasedFile(name.getContent(), key, fileContent, DynamicGroup.get("managers")));
             }
         } else {
-            new ReportTemplate(key, name, description, new GroupBasedFile(name.getContent(), key, fileContent,
-                    DynamicGroup.get("managers")));
+            report =
+                    new ReportTemplate(key, name, description, new GroupBasedFile(name.getContent(), key, fileContent,
+                            DynamicGroup.get("managers")));
         }
+        return report;
     }
 }
