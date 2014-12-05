@@ -12,9 +12,11 @@ import org.fenixedu.oddjet.Template;
 import org.fenixedu.oddjet.table.CategoricalTableData;
 import org.fenixedu.oddjet.table.EntryListTableData;
 import org.fenixedu.oddjet.table.PositionalTableData;
+import org.fenixedu.oddjet.utils.OpenOfficePrintingService;
 import org.fenixedu.oddjet.utils.PrintUtils;
 import org.fenixedu.reports.domain.ReportTemplate;
 import org.fenixedu.reports.domain.ReportTemplatesSystem;
+import org.fenixedu.reports.exceptions.ReportsDomainException;
 
 import com.google.common.base.Preconditions;
 import com.lowagie.text.pdf.PdfCopyFields;
@@ -33,28 +35,44 @@ public class TemplateReportPrinter implements ReportPrinter {
     }
 
     @Override
-    public byte[] printReports(ReportDescription... reports) throws Exception {
-        ReportTemplate report;
+    public ReportResult printReports(ReportDescription... reports) throws Exception {
+        ReportResult document;
         Template template;
+        ReportTemplate report;
         ByteArrayOutputStream mergedPdfs = new ByteArrayOutputStream();
         PdfCopyFields copy = new PdfCopyFields(mergedPdfs);
-
-        for (ReportDescription desc : reports) {
-            report = ReportTemplatesSystem.getInstance().getReportTemplate(desc.getKey());
-
-            if (report == null) {
-                template = defaultReport;
-                prepareDefaultReport(desc.getKey(), "the provided key does not match any known report", desc.getParameters());
+        OpenOfficePrintingService service = ReportTemplatesSystem.getInstance().getPrintingService();
+        if (service == null) {
+            if (reports.length > 1) {
+                throw ReportsDomainException.printMultipleOdts();
             } else {
-                template = report.getTemplate();
-                prepareReport(template, desc.getParameters());
+                template = getReportTemplate(reports[0].getKey(), reports[0].getParameters());
+                document = new ReportResult(template.getInstanceByteArray(), "application/vnd.oasis.opendocument.text", "odt");
             }
-
-            copy.addDocument(new PdfReader(PrintUtils.print(template.getInstance(), ReportTemplatesSystem.getInstance()
-                    .getPrintingService())));
+        } else {
+            for (ReportDescription desc : reports) {
+                template = getReportTemplate(desc.getKey(), desc.getParameters());
+                copy.addDocument(new PdfReader(PrintUtils.print(template.getInstance(), service)));
+            }
+            copy.close();
+            document = new ReportResult(mergedPdfs.toByteArray(), "application/pdf", "pdf");
         }
-        copy.close();
-        return mergedPdfs.toByteArray();
+        return document;
+    }
+
+    private Template getReportTemplate(String key, Map<String, Object> parameters) {
+        Template template;
+        ReportTemplate report = ReportTemplatesSystem.getInstance().getReportTemplate(key);
+
+        if (report == null) {
+            template = defaultReport;
+            prepareDefaultReport(key, "the provided key does not match any known report", parameters);
+        } else {
+            template = report.getTemplate();
+            prepareReport(template, parameters);
+        }
+
+        return template;
     }
 
     private void prepareReport(Template report, Map<String, Object> parameters) {

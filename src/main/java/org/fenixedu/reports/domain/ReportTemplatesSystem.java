@@ -34,11 +34,14 @@ public class ReportTemplatesSystem extends ReportTemplatesSystem_Base {
     }
 
     public OpenOfficePrintingService getPrintingService() {
-        try {
-            return new OpenOfficePrintingService(getServiceHost(), getServicePort(), PDF_FORMAT);
-        } catch (Exception e) {
-            return null;
+        if (getUseService()) {
+            try {
+                return new OpenOfficePrintingService(getServiceHost(), getServicePort(), PDF_FORMAT);
+            } catch (Exception e) {
+                return null;
+            }
         }
+        return null;
     }
 
     @Override
