@@ -16,7 +16,7 @@ public class FileBean implements Serializable {
     public String link;
 
     public FileBean(GenericFile file) {
-        name = file.getDisplayName();
+        name = file.getFilename();
         date = file.getCreationDate().toString("dd/MM/yyyy");
         size = readableFileSize(file.getSize());
         link = FileDownloadServlet.getDownloadUrl(file);

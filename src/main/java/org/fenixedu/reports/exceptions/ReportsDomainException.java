@@ -6,7 +6,7 @@ import org.fenixedu.bennu.core.domain.exceptions.DomainException;
 
 public class ReportsDomainException extends DomainException {
 
-    protected static final String BUNDLE = "resources.ReportsResources";
+    protected static final String BUNDLE = "OdtReportsResources";
 
     protected ReportsDomainException(Response.Status status, String bundle, String key, String... args) {
         super(status, bundle, key, args);

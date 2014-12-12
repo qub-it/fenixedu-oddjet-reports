@@ -31,14 +31,11 @@ public class ReportTemplate extends ReportTemplate_Base {
     @Atomic(mode = TxMode.WRITE)
     public void delete() {
         Iterator<GenericFile> iterator = getTemplateFileSet().iterator();
-        GenericFile firstFile = getTemplateFileSet().iterator().next();
         while (iterator.hasNext()) {
             GenericFile file = iterator.next();
             removeTemplateFile(file);
             file.delete();
-        }
-        addTemplateFile(null);
-        removeTemplateFile(firstFile);
+        };
         setSystem(null);
         deleteDomainObject();
     };

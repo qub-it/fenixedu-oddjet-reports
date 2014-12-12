@@ -3,6 +3,12 @@
 
 <h1><spring:message code="pages.manage.title"/></h1>
 
+<c:if test="${not empty success}">
+	<div class="alert alert-info">
+		<spring:message code="${success}"/>
+	</div>
+</c:if>
+
 <div class="btn-group" style="margin: 10pt 0;">
 	<a href="${pageContext.request.contextPath}/reports/templates/add" class="btn btn-sm btn-primary">
 		<spring:message code="action.add"/>
@@ -10,7 +16,7 @@
 </div>
 
 <c:choose>
-  <c:when test="${not empty reports}">
+  <c:when test="${empty reports}">
   	  <div><spring:message code="pages.manage.emptyReports"/></div>
   </c:when>
 

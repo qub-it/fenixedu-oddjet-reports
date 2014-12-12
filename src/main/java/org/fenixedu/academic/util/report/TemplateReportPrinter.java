@@ -38,7 +38,6 @@ public class TemplateReportPrinter implements ReportPrinter {
     public ReportResult printReports(ReportDescription... reports) throws Exception {
         ReportResult document;
         Template template;
-        ReportTemplate report;
         ByteArrayOutputStream mergedPdfs = new ByteArrayOutputStream();
         PdfCopyFields copy = new PdfCopyFields(mergedPdfs);
         OpenOfficePrintingService service = ReportTemplatesSystem.getInstance().getPrintingService();

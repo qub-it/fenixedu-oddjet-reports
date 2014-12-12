@@ -8,12 +8,6 @@
 	<spring:message code="pages.${taskType}.title"/>
 </h1>
 
-<c:if test="${successful}">
-	<div class="alert alert-info">
-		<spring:message code="pages.${taskType}.success"/>
-	</div>
-</c:if>
-
 <form class="form-horizontal" enctype="multipart/form-data" action="" method="post" role="form">
     <div class="form-group ${errors.onKey != null ? 'has-error' : ''}">
     	<label for="ReportKey" class="col-sm-2 control-label"><spring:message code="pages.edit.label.key"/>:</label>

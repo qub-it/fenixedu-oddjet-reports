@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.view.RedirectView;
 
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
@@ -91,12 +90,11 @@ public class AdminReportTemplates {
         }
 
         if (errors.isEmpty()) {
-            ReportTemplate report = editReportTemplate(null, key, name, description, fileContent);
-            model.addAttribute("reportPreviousFiles", getPreviousFileBeans(report));
-            model.addAttribute("successful", true);
-        } else {
-            model.addAttribute("errors", errors);
+            editReportTemplate(null, key, name, file.getOriginalFilename(), description, fileContent);
+            model.addAttribute("success", "pages.add.success");
+            return list(model);
         }
+        model.addAttribute("errors", errors);
         model.addAttribute("reportDescription", description.json());
         model.addAttribute("reportName", name.json());
         model.addAttribute("reportKey", key);
@@ -151,11 +149,11 @@ public class AdminReportTemplates {
         }
 
         if (errors.isEmpty()) {
-            editReportTemplate(report, key, name, description, fileContent);
-            model.addAttribute("successful", true);
-        } else {
-            model.addAttribute("errors", errors);
+            editReportTemplate(report, key, name, file.getOriginalFilename(), description, fileContent);
+            model.addAttribute("success", "pages.edit.success");
+            return list(model);
         }
+        model.addAttribute("errors", errors);
         model.addAttribute("reportPreviousFiles", getPreviousFileBeans(report));
         model.addAttribute("reportDescription", description.json());
         model.addAttribute("reportName", name.json());
@@ -164,14 +162,15 @@ public class AdminReportTemplates {
     }
 
     @RequestMapping(value = "/{key}/delete")
-    public RedirectView delete(@PathVariable("key") String key, Model model) {
+    public String delete(@PathVariable("key") String key, Model model) {
         ReportTemplate report;
         if (key != null && (report = ReportTemplatesSystem.getInstance().getReportTemplate(key)) != null) {
             report.delete();
+            model.addAttribute("success", "pages.delete.success");
+            return list(model);
         } else {
             throw ReportsDomainException.keyNotFound();
         }
-        return new RedirectView("/reports/templates", true);
     }
 
     private List<FileBean> getPreviousFileBeans(ReportTemplate report) {
@@ -185,14 +184,14 @@ public class AdminReportTemplates {
     }
 
     @Atomic(mode = TxMode.WRITE)
-    private ReportTemplate editReportTemplate(ReportTemplate report, String key, LocalizedString name,
+    private ReportTemplate editReportTemplate(ReportTemplate report, String key, LocalizedString name, String filename,
             LocalizedString description, byte[] fileContent) {
         if (report != null) {
             report.setReportKey(key);
             report.setName(name);
             report.setDescription(description);
             if (fileContent != null) {
-                report.addTemplateFile(new GroupBasedFile(name.getContent(), key, fileContent, DynamicGroup.get("managers")));
+                report.addTemplateFile(new GroupBasedFile(name.getContent(), filename, fileContent, DynamicGroup.get("managers")));
             }
         } else {
             report =
