@@ -17,6 +17,6 @@ public class ReportsDomainException extends DomainException {
     }
 
     public static ReportsDomainException printMultipleOdts() {
-        return new ReportsDomainException(Response.Status.BAD_REQUEST, BUNDLE, "exception.print.multiple.odts");
+        return new ReportsDomainException(Response.Status.INTERNAL_SERVER_ERROR, BUNDLE, "exception.print.multiple.odts");
     }
 }
