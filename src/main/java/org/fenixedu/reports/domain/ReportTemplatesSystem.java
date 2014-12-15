@@ -44,9 +44,8 @@ public class ReportTemplatesSystem extends ReportTemplatesSystem_Base {
         return null;
     }
 
-    @Override
-    public boolean getUseService() {
-        return super.getUseService() && OpenOfficePrintingService.isValidService(getServiceHost(), getServicePort());
+    public boolean hasValidService() {
+        return OpenOfficePrintingService.isValidService(getServiceHost(), getServicePort());
     }
 
     public ReportTemplate getReportTemplate(String key) {

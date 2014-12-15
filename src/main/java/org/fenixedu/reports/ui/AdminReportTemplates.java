@@ -166,7 +166,7 @@ public class AdminReportTemplates {
         ReportTemplate report;
         if (key != null && (report = ReportTemplatesSystem.getInstance().getReportTemplate(key)) != null) {
             report.delete();
-            model.addAttribute("success", "pages.delete.success");
+            model.addAttribute("success", "pages.edit.delete.success");
             return list(model);
         } else {
             throw ReportsDomainException.keyNotFound();

@@ -20,6 +20,7 @@ public class ConfigureReportTemplatesSystem {
     public String configure(Model model) {
         ReportTemplatesSystem system = ReportTemplatesSystem.getInstance();
         model.addAttribute("use", system.getUseService());
+        model.addAttribute("status", system.getUseService() ? system.hasValidService() ? "success" : "warning" : "default");
         model.addAttribute("host", system.getServiceHost());
         model.addAttribute("port", system.getServicePort());
         return "odt-reports/configure";
@@ -48,6 +49,8 @@ public class ConfigureReportTemplatesSystem {
             model.addAttribute("errors", errors);
         }
         model.addAttribute("use", use);
+        model.addAttribute("status",
+                use ? ReportTemplatesSystem.getInstance().hasValidService() ? "success" : "warning" : "default");
         model.addAttribute("host", host);
         model.addAttribute("port", port);
         return "odt-reports/configure";

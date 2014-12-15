@@ -42,43 +42,51 @@
     </div>
 
     <div class="form-group">
-        <div class="col-sm-offset-2 col-sm-6">
+        <div class="col-sm-offset-2 col-sm-3">
             <button type="submit" class="btn btn-default btn-primary">
 				<spring:message code="action.${taskType}"/>
 			</button>
         </div>
     </div>
     
-    
-	<c:if test="${not empty reportPreviousFiles}">
-	    <h3><spring:message code="pages.edit.label.template.previous"/></h3>
-	    <table class="table table-striped">
-	      	<thead>
-	        	<tr>
-	         		<th class="col-md-5"><spring:message code="pages.edit.label.name"/></th>
-	         		<th class="col-md-2 text-center"><spring:message code="pages.edit.label.date"/></th>
-	         		<th class="col-md-2 text-center"><spring:message code="pages.edit.label.size"/></th>
-	         		<th class="col-md-3 text-center"><spring:message code="pages.edit.label.link"/></th>
-	        	</tr>
-	      	</thead>
-	     	<tbody>
-				<c:forEach var="file" items="${reportPreviousFiles}">
-					<tr>
-						<td class="col-md-5">${file.name}</td>
-						<td class="col-md-2 text-center">${file.date}</td>
-						<td class="col-md-2 text-center">${file.size}</td>
-						<td class="col-md-3 text-center">
-							<div class="btn-group">
-								<a href="${file.link}" class="btn btn-sm btn-default">
-									<spring:message code="action.download"/>
-								</a>
-            				</div>
-            			</td>
-					</tr>
-				</c:forEach>
-     		</tbody>
-     	</table>
-	</c:if>
 </form>
+
+<c:if test="${not empty reportPreviousFiles}">
+    <h3><spring:message code="pages.edit.label.template.previous"/></h3>
+    <table class="table table-striped">
+      	<thead>
+        	<tr>
+         		<th class="col-md-5"><spring:message code="pages.edit.label.name"/></th>
+         		<th class="col-md-2 text-center"><spring:message code="pages.edit.label.date"/></th>
+         		<th class="col-md-2 text-center"><spring:message code="pages.edit.label.size"/></th>
+         		<th class="col-md-3 text-center"><spring:message code="pages.edit.label.link"/></th>
+        	</tr>
+      	</thead>
+     	<tbody>
+			<c:forEach var="file" items="${reportPreviousFiles}">
+				<tr>
+					<td class="col-md-5">${file.name}</td>
+					<td class="col-md-2 text-center">${file.date}</td>
+					<td class="col-md-2 text-center">${file.size}</td>
+					<td class="col-md-3 text-center">
+						<div class="btn-group">
+							<a href="${file.link}" class="btn btn-sm btn-default">
+								<spring:message code="action.download"/>
+							</a>
+           				</div>
+           			</td>
+				</tr>
+			</c:forEach>
+    		</tbody>
+   	</table>
+</c:if>
+
+<c:if test="${taskType eq 'edit'}">
+	<div class="btn-group">
+		<a href="${pageContext.request.contextPath}/reports/templates/${report.key}/delete" class="btn btn-sm btn-danger">
+			<spring:message code="action.delete"/>
+		</a>
+	</div>
+</c:if>
 
 ${portal.toolkit()}

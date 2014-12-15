@@ -24,7 +24,14 @@
       		<input type="checkbox" name="use" id="UseService" ${use ? 'checked' : ''} value="true">
     	</div>
   	</div>
-
+  	
+  	<div class="form-group">
+    	<label class="col-sm-2 control-label"><spring:message code="pages.configure.label.status"/>:</label>
+    	<p class="col-sm-6">
+      		<span class="label label-${status}"><spring:message code="pages.configure.status.${status}"/></span>
+    	</p>
+  	</div>
+  	
     <div class="form-group ${errors.onHost != null ? 'has-error' : ''}">
     	<label for="ServiceHost" class="col-sm-2 control-label"><spring:message code="pages.configure.label.host"/>:</label>
     	<div class="col-sm-3">
