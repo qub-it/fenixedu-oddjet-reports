@@ -8,8 +8,7 @@ import org.fenixedu.reports.domain.ReportTemplate;
 
 public class ReportBean implements Serializable {
 
-    //TODO compute the serial UID again...
-    private static final long serialVersionUID = 1984238939829213255L;
+    private static final long serialVersionUID = 7061427982068967745L;
     public String key;
     public LocalizedString name;
     public LocalizedString description;

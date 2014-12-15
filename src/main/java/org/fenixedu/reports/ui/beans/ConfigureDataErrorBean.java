@@ -4,8 +4,7 @@ import java.io.Serializable;
 
 public class ConfigureDataErrorBean implements Serializable {
 
-    //TODO compute the serial UID again...
-    private static final long serialVersionUID = 1798742222223374397L;
+    private static final long serialVersionUID = -65980313033434823L;
     public String onHost;
     public String onPort;
     public String onOutputFormat;

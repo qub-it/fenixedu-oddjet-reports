@@ -4,8 +4,7 @@ import java.io.Serializable;
 
 public class AdminDataErrorBean implements Serializable {
 
-    //TODO compute the serial UID again...
-    private static final long serialVersionUID = 1798743927098274397L;
+    private static final long serialVersionUID = -1108186100882718887L;
     public String onKey;
     public String onName;
     public String onDescription;

@@ -8,8 +8,7 @@ import org.fenixedu.bennu.io.servlets.FileDownloadServlet;
 
 public class FileBean implements Serializable {
 
-    //TODO compute the serial UID again...
-    private static final long serialVersionUID = 1798748987098274397L;
+    private static final long serialVersionUID = -5975971883863953123L;
     public String name;
     public String date;
     public String size;
