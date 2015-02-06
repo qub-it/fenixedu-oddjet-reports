@@ -83,7 +83,7 @@
 
 <c:if test="${taskType eq 'edit'}">
 	<div class="btn-group">
-		<a href="${pageContext.request.contextPath}/reports/templates/${report.key}/delete" class="btn btn-sm btn-danger">
+		<a href="${pageContext.request.contextPath}/reports/templates/${reportKey}/delete" class="btn btn-sm btn-danger">
 			<spring:message code="action.delete"/>
 		</a>
 	</div>

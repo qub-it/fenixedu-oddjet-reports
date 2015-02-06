@@ -1,5 +1,7 @@
 package org.fenixedu.reports.domain;
 
+import java.util.Iterator;
+
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.oddjet.utils.OpenOfficePrintingService;
 
@@ -49,7 +51,15 @@ public class ReportTemplatesSystem extends ReportTemplatesSystem_Base {
     }
 
     public ReportTemplate getReportTemplate(String key) {
-        return getReportTemplatesSet().stream().filter(r -> key.equals(r.getReportKey())).findAny().orElse(null);
+        Iterator<ReportTemplate> rtIt = getReportTemplatesSet().iterator();
+        ReportTemplate rt;
+        while (rtIt.hasNext()) {
+            rt = rtIt.next();
+            if (key.equals(rt.getReportKey())) {
+                return rt;
+            }
+        }
+        return null;
     }
 
 }
