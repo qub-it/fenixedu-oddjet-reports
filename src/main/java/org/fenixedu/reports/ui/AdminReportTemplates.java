@@ -195,7 +195,7 @@ public class AdminReportTemplates {
             }
         } else {
             report =
-                    new ReportTemplate(key, name, description, new GroupBasedFile(name.getContent(), key, fileContent,
+                    new ReportTemplate(key, name, description, new GroupBasedFile(name.getContent(), filename, fileContent,
                             DynamicGroup.get("managers")));
         }
         return report;
