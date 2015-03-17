@@ -124,6 +124,12 @@ public class TemplateReportPrinter implements ReportPrinter {
             types.add(parameter.getValue().getClass().getSimpleName());
             contents.add(parameter.getValue().toString());
         }
+        
+        for (Entry<String, Object> parameter : parameters.entrySet()) {
+            keys.add(parameter.getKey());
+            types.add(parameter.getValue() != null ? parameter.getValue().getClass().getSimpleName() : "<unknown-type>");
+            contents.add(parameter.getValue() != null ? parameter.getValue().toString() : "<unknown-value>");
+        }
 
         defaultReport.addTableDataSource("reportData", new CategoricalTableData(data));
 
